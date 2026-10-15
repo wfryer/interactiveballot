@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive Ballot: Make Your Own Voter Guide</title>
+<meta name="description" content="A Heal Our Culture project. Turn your official sample ballot PDF into an interactive, nonpartisan voter guide with links to every candidate. Copy the prompt, upload your ballot to your AI tool, and share what you make.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Interactive Ballot: Make Your Own Voter Guide">
+<meta property="og:description" content="Turn your official sample ballot into an interactive, nonpartisan voter guide with a link to every candidate. A Heal Our Culture project.">
+<meta property="og:url" content="https://interactiveballot.com/">
+<meta name="twitter:card" content="summary">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;color:#1b1f24;background:#f5f3ee}
+a{color:#0b4f9c}
+a:hover{color:#06336a}
+a:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid #1a1a1a;outline-offset:2px}
+.skip{position:absolute;left:-999px;top:0;background:#fff;padding:8px 12px;z-index:100}
+.skip:focus{left:8px;top:8px}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+header.site{background:#1c2b3a;color:#fff;padding:34px 0 28px}
+header.site h1{margin:0 0 8px;font-size:2rem;line-height:1.15}
+header.site p{margin:6px 0;color:#dbe4ee;font-size:1.08rem}
+header.site a{color:#fff}
+.pill{display:inline-block;border:1px solid #8fa3b8;border-radius:999px;padding:2px 10px;font-size:.82rem;margin:8px 6px 0 0;color:#e9eff5}
+.swatches{display:flex;gap:6px;margin-top:16px}
+.swatches span{width:46px;height:10px;border-radius:5px}
+.sR{background:#fbdcdc}.sD{background:#dbe8fb}.sG{background:#dcf1dc}.sL{background:#fff1c9}.sN{background:#eeeeee}
+section.panel{background:#fff;border:1px solid #d9d4c7;border-radius:12px;padding:18px 20px;margin:20px 0}
+section.panel h2{margin:0 0 8px;font-size:1.3rem;line-height:1.25}
+section.panel h3{margin:18px 0 4px;font-size:1.05rem}
+.lead{font-size:1.08rem}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:10px 0}
+ol.steps li{counter-increment:s;position:relative;padding:4px 0 10px 46px;margin:0}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:2px;width:32px;height:32px;border-radius:50%;background:#1c2b3a;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;background:#1c2b3a;color:#fff;border:2px solid #1c2b3a;border-radius:10px;padding:10px 16px;min-height:46px;cursor:pointer;text-decoration:none}
+.btn:hover{background:#2a4057;color:#fff}
+.btn.alt{background:#fff;color:#1c2b3a}
+.btn.alt:hover{background:#eef2f6;color:#1c2b3a}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+textarea#prompt{width:100%;height:340px;font:.86rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:2px solid #1c2b3a;border-radius:10px;padding:12px;background:#fbfaf7;color:#1b1f24;resize:vertical}
+.status{min-height:1.4em;font-weight:700;color:#0d5c2a;margin:4px 0 0}
+.cards{display:grid;gap:12px;grid-template-columns:1fr;margin-top:10px}
+@media(min-width:700px){.cards{grid-template-columns:1fr 1fr}}
+.card{border:1px solid #cfc9b8;border-radius:12px;padding:14px 16px;background:#fbfaf7}
+.card h3{margin:0 0 2px;font-size:1.05rem}
+.card p{margin:4px 0;font-size:.95rem}
+.card .tagline{font-size:.82rem;color:#444;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.card.soon{border-style:dashed;background:#fff}
+.note{background:#fff8e1;border:1px solid #e3cf86;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:.96rem}
+.faq details{border-top:1px solid #e1dccd;padding:10px 0}
+.faq summary{cursor:pointer;font-weight:700}
+.faq p{margin:8px 0 2px}
+footer{margin:30px 0 40px;font-size:.92rem;color:#333}
+.finder label{display:block;font-weight:700;margin:8px 0 4px}
+.finder select{width:100%;max-width:420px;font:inherit;padding:10px 12px;min-height:46px;border:2px solid #1c2b3a;border-radius:10px;background:#fff;color:#1b1f24}
+.result{margin-top:14px;border:1px solid #cfc9b8;border-radius:12px;padding:14px 16px;background:#fbfaf7}
+.result[hidden]{display:none}
+.result h3{margin:0 0 4px}
+.kind{font-size:.9rem;margin:4px 0 10px}
+.also{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 0;font-size:.95rem}
+.statelist{columns:2 220px;column-gap:20px;padding-left:18px;margin:8px 0}
+.statelist li{margin:2px 0}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:520px}
+@media(max-width:420px){.share-grid{grid-template-columns:1fr}}
+.feeds{display:flex;flex-wrap:wrap;gap:6px 16px;margin:6px 0}
+#formWrap[hidden]{display:none}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site"><div class="wrap">
+<h1>Interactive Ballot</h1>
+<p>Turn your official sample ballot into a voter guide with a link to every candidate, in about ten minutes.</p>
+<p>A <a href="https://healourculture.org">Heal Our Culture</a> project</p>
+<p><span class="pill">Nonpartisan</span><span class="pill">Experimental</span><span class="pill">Not affiliated with any candidate, campaign, party, or election office</span></p>
+<div class="swatches" aria-hidden="true"><span class="sR"></span><span class="sD"></span><span class="sG"></span><span class="sL"></span><span class="sN"></span></div>
+</div></header>
+
+<main id="main" class="wrap">
+
+<section class="panel" aria-labelledby="why">
+<h2 id="why">Why Interactive Ballot?</h2>
+<p class="lead">Our politics are too polarized, and many of us walk into the voting booth knowing only the names we have seen in headlines and ads. Interactive Ballot is part of <a href="https://healourculture.org">Heal Our Culture</a>, an effort to reduce political polarization and help neighbors take part as informed citizens.</p>
+<p>The project has two goals:</p>
+<ul>
+<li><strong>Help voters and citizens arrive at the polls better informed.</strong> Every candidate on your ballot, from president to school board, gets the same treatment and the same kind of link.</li>
+<li><strong>Encourage candidates to use their websites and digital resources</strong> to explain their ideas, experience, background, and fitness and desirability for office. When a candidate has no website, your ballot will say so plainly, so voters can see who makes that information easy to find.</li>
+</ul>
+</section>
+
+<section class="panel" aria-labelledby="how">
+<h2 id="how">How it works</h2>
+<p class="lead">You bring your own sample ballot. An AI tool does the research and builds a page just for your ballot, with a link to each candidate's official website, or the next best source when there isn't one.</p>
+<ol class="steps">
+<li><strong>Get your sample ballot as a PDF.</strong> Use the state finder just below. Your county election office posts a sample ballot for each precinct, and most states point you there through their official voter lookup.</li>
+<li><strong>Open an AI tool and attach the PDF.</strong> We built this with <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a> and recommend a Claude Pro plan, because researching every candidate and building the page takes a lot of work. Other AI tools that can read a PDF, search the web, and create files may also work.</li>
+<li><strong>Paste the prompt below and send it.</strong> Review what you get, click the links, and print the cheat sheet to take with you.</li>
+</ol>
+</section>
+
+<section class="panel finder" aria-labelledby="fnd">
+<h2 id="fnd">Find your sample ballot</h2>
+<p>Pick your state to open its official election site. Look yourself up with your address, then save or print your sample ballot as a PDF.</p>
+<label for="stateSel">Your state</label>
+<select id="stateSel"><option value="">Choose a state</option></select>
+<div class="result" id="stateOut" role="status" aria-live="polite" hidden></div>
+<noscript><p>JavaScript is off, so use the full list below, or try <a href="https://www.vote411.org/">Vote411</a>.</p></noscript>
+<p class="also"><span>Also try:</span> <a href="https://www.vote411.org/" target="_blank" rel="noopener">Vote411 (League of Women Voters)</a> <a href="https://usvotefoundation.org/sample-ballot-lookup" target="_blank" rel="noopener">US Vote Foundation sample ballot lookup</a></p>
+<details style="margin-top:12px"><summary><strong>See all states</strong></summary><ul class="statelist" id="stateList"></ul></details>
+<div class="note">State websites change, and some sample ballots only appear a few weeks before an election. If a link fails, search for your county name plus "sample ballot," or call your county elections office.</div>
+</section>
+
+<section class="panel" aria-labelledby="pr">
+<h2 id="pr">The prompt</h2>
+<p>Copy this, paste it into your AI tool along with your sample ballot PDF, and send.</p>
+<div class="row">
+<button class="btn" id="copyBtn" type="button">Copy the prompt</button>
+<a class="btn alt" href="https://claude.ai/new" target="_blank" rel="noopener">Open Claude</a>
+</div>
+<p class="status" id="copyStatus" role="status" aria-live="polite"></p>
+<label for="prompt" class="sr-only" style="position:absolute;left:-999px">Interactive Ballot prompt</label>
+<textarea id="prompt" readonly>You are helping me build a nonpartisan, interactive voter guide from my official sample ballot, which is attached as a PDF.
+
+GOAL
+Create one self-contained HTML file (inline CSS and JavaScript, no frameworks, no external libraries) that mirrors my ballot and links every candidate and ballot question to good information, so I can learn about everyone before I vote.
+
+STEP 1: READ THE BALLOT
+Read the attached PDF carefully. Extract the election date, jurisdiction, precinct, every contest in ballot order, how many candidates I may vote for in each contest, every candidate exactly as printed with party, and the full text of every referendum, amendment, or bond question. Do not add or drop anyone. If the PDF is unreadable, tell me and ask me to re-upload it. Otherwise do not stop to ask questions: state any assumptions at the top of the page.
+
+STEP 2: RESEARCH EVERY CANDIDATE
+Use web search. For each candidate, find links in this order of preference:
+1. Their official campaign website.
+2. Their Ballotpedia page.
+3. Another reputable third-party profile, such as Elevra, Branch Politics, BallotReady, Vote411 (League of Women Voters), or a local nonpartisan voter guide or news outlet.
+For each race, also look for a nonpartisan race guide from a local newsroom or the League of Women Voters and link it at the top of the race.
+Rules for links:
+- Never guess or invent a URL. Only use links you actually found in search results or opened and read.
+- Confirm that each page is for the same person, the same office, and this election year.
+- Label every link as one of: Official campaign website, Government or official page (not a campaign site), or Third-party information. Never present a third-party page as the candidate's own site.
+- If you cannot find an official campaign site, say so plainly on that candidate's card.
+
+STEP 3: BALLOT QUESTIONS
+For each referendum, amendment, or bond, show the official ballot wording, then link to the official summary and to neutral explainers. Where good sources exist, include both supporters' and opponents' arguments. Do not tell me how to vote.
+
+STEP 4: STAY NONPARTISAN
+Give every candidate the same format and the same depth. Do not endorse, rank, rate, or recommend anyone, and do not describe anyone with loaded language. Keep any summaries factual and neutral.
+
+STEP 5: BUILD THE PAGE
+- Mobile first, readable, accessible (good contrast, large tap targets, keyboard friendly, real headings).
+- Group races in the same order as the ballot. Show "Vote for ONE" (or TWO, THREE) for each contest.
+- Color each candidate card by party: Republican light red, Democratic light blue, Green light green, Libertarian light yellow, all others and nonpartisan light gray. Also show the party name as a text chip, so color is never the only signal.
+- Show a clear status badge on each link: official campaign website, government page, or third-party.
+- Add a "My pick" checkbox (or radio buttons for yes/no questions) in each contest that enforces the vote-for-N limit. Save my picks in localStorage inside try/catch so the page still works if storage is blocked. Show a counter of contests decided.
+- Add a print-friendly cheat sheet table of my picks with Print and Clear buttons, and a print stylesheet that prints only that table.
+- Include a short "how to use this page" panel, a color and badge legend, and a footer that says the page is nonpartisan, experimental, and not affiliated with any candidate, campaign, party, or election office, that links were gathered on today's date, and that I should confirm everything against my official ballot.
+- Credit line: "Made with the Interactive Ballot prompt from interactiveballot.com, a Heal Our Culture project".
+- Do not use em dashes or double hyphens in any text.
+
+STEP 6: CHECK YOUR WORK
+Compare the finished page to the PDF name by name: every contest, candidate, party, vote-for-N number, and ballot question must match. Fix any mismatch. Then test that the checkboxes, limits, and print view work.
+
+STEP 7: DELIVER
+Give me the HTML file to download (or as an artifact if you cannot create files). Then reply with a short summary:
+- Which candidates have no official campaign website.
+- Which links you are less sure about and why.
+- A reminder to click through the links and verify before relying on them.</textarea>
+<div class="note"><strong>Check the results.</strong> AI tools can make mistakes. Click the links, compare the page to your real ballot, and tell the AI to fix anything that looks wrong. This is a starting point for your own research, not advice on how to vote.</div>
+</section>
+
+<section class="panel" aria-labelledby="ex">
+<h2 id="ex">Interactive ballots made so far</h2>
+<div class="cards" id="gallery">
+<article class="card">
+<p class="tagline">November 3, 2026 &middot; General</p>
+<h3>Union County, North Carolina</h3>
+<p>Federal, state, judicial, and county races, plus three constitutional amendments and a jail bond. Includes a printable cheat sheet.</p>
+<p><a class="btn" href="https://wfryer.github.io/interactive-ballot-union-nc-2026/">Open this ballot</a></p>
+<p><a href="https://github.com/wfryer/interactive-ballot-union-nc-2026" target="_blank" rel="noopener">View the code on GitHub</a></p>
+</article>
+<article class="card">
+<p class="tagline">November 4, 2025 &middot; Municipal</p>
+<h3>Town of Stallings, North Carolina</h3>
+<p>The first version: nonpartisan town races and a room occupancy tax question, with candidate profile links.</p>
+<p><a class="btn alt" href="stallings-2025/">Open this ballot</a></p>
+</article>
+<article class="card soon">
+<p class="tagline">Your turn</p>
+<h3>Your ballot could be next</h3>
+<p>Make one with the prompt above, then share it so others in your community can use it too.</p>
+<p><a class="btn alt" href="#share">Share yours</a></p>
+</article>
+</div>
+</section>
+
+<section class="panel" id="share" aria-labelledby="sh">
+<h2 id="sh">Made one? Share it.</h2>
+<p>Sharing helps neighbors who vote on the same ballot, and it helps others see what is possible. Post it with the hashtag <strong>#InteractiveBallot</strong>.</p>
+<div class="row">
+<button class="btn alt" id="copyTag" type="button">Copy #InteractiveBallot</button>
+</div>
+<div class="share-grid">
+<a class="btn alt" id="shBsky" href="#" target="_blank" rel="noopener">Share on Bluesky</a>
+<a class="btn alt" id="shMast" href="#" target="_blank" rel="noopener">Share on Mastodon</a>
+<a class="btn alt" id="shFb" href="#" target="_blank" rel="noopener">Share on Facebook</a>
+<a class="btn alt" id="shLi" href="#" target="_blank" rel="noopener">Share on LinkedIn</a>
+</div>
+<h3>See what people are sharing</h3>
+<div class="feeds">
+<a href="https://bsky.app/hashtag/InteractiveBallot" target="_blank" rel="noopener">Bluesky feed</a>
+<a href="https://mastodon.social/tags/InteractiveBallot" target="_blank" rel="noopener">Mastodon feed</a>
+<a href="https://www.facebook.com/hashtag/interactiveballot" target="_blank" rel="noopener">Facebook</a>
+<a href="https://www.linkedin.com/feed/hashtag/interactiveballot/" target="_blank" rel="noopener">LinkedIn</a>
+</div>
+<p class="small" style="font-size:.9rem">Bluesky and Mastodon hashtags are public and easy to search. Facebook and LinkedIn show fewer posts, and mostly from people you can already see, so the form below is the best way to be counted.</p>
+<div id="formWrap" hidden>
+<h3>Add your ballot to this page</h3>
+<p>Fill out a short form with a link to your ballot, and it may be featured here. Only share ballots you have built from an official sample ballot.</p>
+<p><a class="btn" id="formLink" href="#" target="_blank" rel="noopener">Submit your ballot</a></p>
+</div>
+<p class="status" id="tagStatus" role="status" aria-live="polite"></p>
+<h3>Sharing tips</h3>
+<ul>
+<li>Host your file anywhere that serves web pages, such as GitHub Pages, or simply share the HTML file.</li>
+<li>Your sample ballot shows your precinct, not your name, but remove anything personal before you post.</li>
+<li>If you share it, keep it nonpartisan, and say when the links were gathered.</li>
+</ul>
+</section>
+
+<section class="panel faq" aria-labelledby="fq">
+<h2 id="fq">Questions</h2>
+<details><summary>Does this tell me who to vote for?</summary><p>No. Every candidate gets the same treatment and links. The goal is to make it easier to learn about each person, not to steer anyone.</p></details>
+<details><summary>Where are my picks saved?</summary><p>Only in your own browser, on your own device. Nothing is sent anywhere. Clearing your browser data erases them, so use the print button for a copy.</p></details>
+<details><summary>Do I have to use Claude?</summary><p>No. The prompt is plain text. Any AI tool that can read a PDF, search the web, and create a file may work, but results vary. We built these with Claude and recommend a Claude Pro plan for a job this large.</p></details>
+<details><summary>What if a candidate has no website?</summary><p>The prompt tells the AI to say so plainly and link the next best source, such as Ballotpedia or a nonpartisan voter guide, and to label it as third-party so you know it is not the candidate's own site.</p></details>
+<details><summary>Can I use it outside North Carolina?</summary><p>Yes. Any sample ballot PDF from any state or county should work. Local races may have fewer sources, so expect more third-party links.</p></details>
+</section>
+
+</main>
+
+<footer class="wrap">
+<p>Interactive Ballot is a nonpartisan, experimental project, not affiliated with any candidate, campaign, political party, or election office. Always confirm details with your official ballot and your local election office.</p>
+<p>An Interactive Ballot project of <a href="https://healourculture.org">Heal Our Culture</a>. Created by <a href="https://ai.wesfryer.com">Wes Fryer</a>.</p>
+</footer>
+
+<script>
+/* Set FORM_URL to your Google Form link to show the submit button. Leave it empty to hide it. */
+var FORM_URL = "";
+var TAG = "#InteractiveBallot";
+
+function copyText(text, statusEl, okMsg){
+  function done(){ statusEl.textContent = okMsg; setTimeout(function(){ statusEl.textContent = ""; }, 4000); }
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); }
+    catch (e) { statusEl.textContent = "Copy did not work. Press and hold in the box to select all, then copy."; }
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } else { fallback(); }
+}
+
+document.getElementById("copyBtn").addEventListener("click", function(){
+  copyText(document.getElementById("prompt").value, document.getElementById("copyStatus"), "Copied. Now paste it into your AI tool with your ballot PDF attached.");
+});
+document.getElementById("copyTag").addEventListener("click", function(){
+  copyText(TAG, document.getElementById("tagStatus"), "Copied " + TAG);
+});
+var SHARE_URL = "https://interactiveballot.com";
+var SHARE_TEXT = "I made an interactive voter guide from my sample ballot. Make yours at " + SHARE_URL + " " + TAG;
+document.getElementById("shBsky").href = "https://bsky.app/intent/compose?text=" + encodeURIComponent(SHARE_TEXT);
+document.getElementById("shMast").href = "https://mastodon.social/share?text=" + encodeURIComponent(SHARE_TEXT);
+document.getElementById("shFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(SHARE_URL) + "&hashtag=" + encodeURIComponent(TAG);
+document.getElementById("shLi").href = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(SHARE_URL);
+
+/* State finder. kind b = the page shows or links a sample ballot; l = voter lookup, sample ballot comes from your county. */
+var STATES = [
+  ["AL", "Alabama", "https://myinfo.alabamavotes.gov/", "l"],
+  ["AK", "Alaska", "https://myvoterportal.alaska.gov/", "b"],
+  ["AZ", "Arizona", "https://my.arizona.vote/", "b"],
+  ["AR", "Arkansas", "https://www.voterview.ar-nova.org/voterview", "l"],
+  ["CA", "California", "https://voterstatus.sos.ca.gov/", "l"],
+  ["CO", "Colorado", "https://www.coloradosos.gov/voter/pages/pub/home.xhtml", "b"],
+  ["CT", "Connecticut", "https://portal.ct.gov/sots", "l"],
+  ["DE", "Delaware", "https://ivote.de.gov/VoterView", "l"],
+  ["DC", "District of Columbia", "https://dcboe.org/Voters", "l"],
+  ["FL", "Florida", "https://registration.dos.fl.gov/CheckVoterStatus", "l"],
+  ["GA", "Georgia", "https://mvp.sos.ga.gov/", "b"],
+  ["HI", "Hawaii", "https://elections.hawaii.gov/", "l"],
+  ["ID", "Idaho", "https://voteidaho.gov/", "l"],
+  ["IL", "Illinois", "https://www.elections.il.gov/", "l"],
+  ["IN", "Indiana", "https://indianavoters.in.gov/", "l"],
+  ["IA", "Iowa", "https://apps.sos.iowa.gov/elections/voterreg/regtovote/search.aspx", "l"],
+  ["KS", "Kansas", "https://myvoteinfo.voteks.org/VoterView/RegistrantSearch.do", "l"],
+  ["KY", "Kentucky", "https://vrsws.sos.ky.gov/vic/", "l"],
+  ["LA", "Louisiana", "https://voterportal.sos.la.gov/", "l"],
+  ["ME", "Maine", "https://www.maine.gov/sos/cec/elec/voter-info/index.html", "b"],
+  ["MD", "Maryland", "https://voterservices.elections.maryland.gov/votersearch", "l"],
+  ["MA", "Massachusetts", "https://www.sec.state.ma.us/wheredoivotema/bal/myelectioninfo.aspx", "l"],
+  ["MI", "Michigan", "https://mvic.sos.state.mi.us/PublicBallot/Index", "b"],
+  ["MN", "Minnesota", "https://myballotmn.sos.mn.gov/", "b"],
+  ["MS", "Mississippi", "https://www.sos.ms.gov/elections-voting", "b"],
+  ["MO", "Missouri", "https://voteroutreach.sos.mo.gov/PRD/VoterOutreach/VOMain.aspx", "l"],
+  ["MT", "Montana", "https://voterportal.mt.gov/", "l"],
+  ["NE", "Nebraska", "https://www.votercheck.necvr.ne.gov/", "l"],
+  ["NV", "Nevada", "https://www.nvsos.gov/votersearch/", "l"],
+  ["NH", "New Hampshire", "https://app.sos.nh.gov/viphome", "l"],
+  ["NJ", "New Jersey", "https://voter.svrs.nj.gov/", "l"],
+  ["NM", "New Mexico", "https://voterportal.servis.sos.state.nm.us/", "b"],
+  ["NY", "New York", "https://voterlookup.elections.ny.gov/", "l"],
+  ["NC", "North Carolina", "https://vt.ncsbe.gov/RegLkup", "b"],
+  ["ND", "North Dakota", "https://vip.sos.nd.gov/", "b"],
+  ["OH", "Ohio", "https://www.ohiosos.gov/elections/voters/toolkit/sample-ballot/", "b"],
+  ["OK", "Oklahoma", "https://okvoterportal.okelections.us/", "l"],
+  ["OR", "Oregon", "https://sos.oregon.gov/voting/Pages/myvote.aspx", "l"],
+  ["PA", "Pennsylvania", "https://www.pavoterservices.pa.gov/Pages/VoterRegistrationStatus.aspx", "l"],
+  ["RI", "Rhode Island", "https://vote.sos.ri.gov/", "b"],
+  ["SC", "South Carolina", "https://scvotes.gov/", "b"],
+  ["SD", "South Dakota", "https://vip.sdsos.gov/", "l"],
+  ["TN", "Tennessee", "https://tnmap.tn.gov/voterlookup/", "l"],
+  ["TX", "Texas", "https://teamrv-mvp.sos.texas.gov/MVP/mvp.do", "l"],
+  ["UT", "Utah", "https://vote.utah.gov/", "l"],
+  ["VT", "Vermont", "https://vote.vermont.gov/", "l"],
+  ["VA", "Virginia", "https://vote.elections.virginia.gov/VoterInformation", "l"],
+  ["WA", "Washington", "https://voter.votewa.gov/", "l"],
+  ["WV", "West Virginia", "https://sos.wv.gov/elections", "b"],
+  ["WI", "Wisconsin", "https://myvote.wi.gov/", "l"],
+  ["WY", "Wyoming", "https://sos.wyo.gov/Elections/Default.aspx", "l"]
+];
+
+(function(){
+  var sel = document.getElementById("stateSel"), out = document.getElementById("stateOut"), list = document.getElementById("stateList");
+  function host(u){ return u.replace(/^https?:\/\//, "").split("/")[0]; }
+  STATES.forEach(function(st){
+    var o = document.createElement("option"); o.value = st[0]; o.textContent = st[1]; sel.appendChild(o);
+    var li = document.createElement("li"), a = document.createElement("a");
+    a.href = st[2]; a.target = "_blank"; a.rel = "noopener"; a.textContent = st[1]; li.appendChild(a); list.appendChild(li);
+  });
+  function show(code){
+    var st = null; STATES.forEach(function(x){ if (x[0] === code) st = x; });
+    if (!st) { out.hidden = true; out.textContent = ""; return; }
+    out.textContent = "";
+    var h = document.createElement("h3"); h.textContent = st[1]; out.appendChild(h);
+    var k = document.createElement("p"); k.className = "kind";
+    k.textContent = st[3] === "b"
+      ? "This official page shows or links your sample ballot after you enter your information."
+      : "This is your state's official voter lookup or election site. Sample ballots in this state usually come from your county elections office, so look for a link to your county after you search.";
+    out.appendChild(k);
+    var a = document.createElement("a"); a.className = "btn"; a.href = st[2]; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = "Open " + st[1] + " official site"; out.appendChild(a);
+    var hs = document.createElement("p"); hs.className = "kind"; hs.textContent = "Opens " + host(st[2]); out.appendChild(hs);
+    out.hidden = false;
+  }
+  sel.addEventListener("change", function(){ show(sel.value); });
+})();
+
+if (FORM_URL) {
+  document.getElementById("formLink").href = FORM_URL;
+  document.getElementById("formWrap").hidden = false;
+}
+</script>
+</body>
+</html>
