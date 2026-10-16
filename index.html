@@ -104,6 +104,7 @@ footer{margin:30px 0 40px;font-size:.92rem;color:#333}
 <section class="panel finder" aria-labelledby="fnd">
 <h2 id="fnd">Find your sample ballot</h2>
 <p>Pick your state to open its official election site. Look yourself up with your address, then save or print your sample ballot as a PDF.</p>
+<p>Not every state provides sample ballots online. As of October 15, 2026, Iowa, Kentucky, Missouri, New Jersey and New York do not appear to. For those states we link to the main official election information page instead.</p>
 <label for="stateSel">Your state</label>
 <select id="stateSel"><option value="">Choose a state</option></select>
 <div class="result" id="stateOut" role="status" aria-live="polite" hidden></div>
@@ -279,48 +280,49 @@ document.getElementById("shMast").href = "https://mastodon.social/share?text=" +
 document.getElementById("shFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(SHARE_URL) + "&hashtag=" + encodeURIComponent(TAG);
 document.getElementById("shLi").href = "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(SHARE_URL);
 
-/* State finder. kind b = the page shows or links a sample ballot; l = voter lookup, sample ballot comes from your county. */
+/* State finder. kind b = the page shows or links a sample ballot; l = voter lookup, sample ballot comes from your county;
+   n = no online sample ballot found as of Oct 15, 2026, so the link goes to the main official election page. */
 var STATES = [
   ["AL", "Alabama", "https://myinfo.alabamavotes.gov/", "l"],
   ["AK", "Alaska", "https://myvoterportal.alaska.gov/", "b"],
-  ["AZ", "Arizona", "https://my.arizona.vote/", "b"],
+  ["AZ", "Arizona", "https://my.arizona.vote/WhereToVote.aspx?s=address", "b"],
   ["AR", "Arkansas", "https://www.voterview.ar-nova.org/voterview", "l"],
   ["CA", "California", "https://voterstatus.sos.ca.gov/", "l"],
   ["CO", "Colorado", "https://www.coloradosos.gov/voter/pages/pub/home.xhtml", "b"],
   ["CT", "Connecticut", "https://portal.ct.gov/sots", "l"],
   ["DE", "Delaware", "https://ivote.de.gov/VoterView", "l"],
-  ["DC", "District of Columbia", "https://dcboe.org/Voters", "l"],
+  ["DC", "District of Columbia", "https://dcboe.org/elections/2026-elections", "b"],
   ["FL", "Florida", "https://registration.dos.fl.gov/CheckVoterStatus", "l"],
   ["GA", "Georgia", "https://mvp.sos.ga.gov/", "b"],
   ["HI", "Hawaii", "https://elections.hawaii.gov/", "l"],
   ["ID", "Idaho", "https://voteidaho.gov/", "l"],
   ["IL", "Illinois", "https://www.elections.il.gov/", "l"],
   ["IN", "Indiana", "https://indianavoters.in.gov/", "l"],
-  ["IA", "Iowa", "https://apps.sos.iowa.gov/elections/voterreg/regtovote/search.aspx", "l"],
-  ["KS", "Kansas", "https://myvoteinfo.voteks.org/VoterView/RegistrantSearch.do", "l"],
-  ["KY", "Kentucky", "https://vrsws.sos.ky.gov/vic/", "l"],
+  ["IA", "Iowa", "https://sos.iowa.gov/voters/voter-registration-faqs", "n"],
+  ["KS", "Kansas", "https://myvoteinfo.voteks.org/VoterView", "l"],
+  ["KY", "Kentucky", "https://vrsws.sos.ky.gov/vic/Default.aspx", "n"],
   ["LA", "Louisiana", "https://voterportal.sos.la.gov/", "l"],
-  ["ME", "Maine", "https://www.maine.gov/sos/cec/elec/voter-info/index.html", "b"],
+  ["ME", "Maine", "https://www.maine.gov/sos/elections-voting/information-about-voting", "b"],
   ["MD", "Maryland", "https://voterservices.elections.maryland.gov/votersearch", "l"],
   ["MA", "Massachusetts", "https://www.sec.state.ma.us/wheredoivotema/bal/myelectioninfo.aspx", "l"],
   ["MI", "Michigan", "https://mvic.sos.state.mi.us/PublicBallot/Index", "b"],
   ["MN", "Minnesota", "https://myballotmn.sos.mn.gov/", "b"],
   ["MS", "Mississippi", "https://www.sos.ms.gov/elections-voting", "b"],
-  ["MO", "Missouri", "https://voteroutreach.sos.mo.gov/PRD/VoterOutreach/VOMain.aspx", "l"],
+  ["MO", "Missouri", "https://voteroutreach.sos.mo.gov/portal", "n"],
   ["MT", "Montana", "https://voterportal.mt.gov/", "l"],
   ["NE", "Nebraska", "https://www.votercheck.necvr.ne.gov/", "l"],
   ["NV", "Nevada", "https://www.nvsos.gov/votersearch/", "l"],
-  ["NH", "New Hampshire", "https://app.sos.nh.gov/viphome", "l"],
-  ["NJ", "New Jersey", "https://voter.svrs.nj.gov/", "l"],
+  ["NH", "New Hampshire", "https://app.sos.nh.gov/pollingplacesampleballot", "b"],
+  ["NJ", "New Jersey", "https://www.nj.gov/state/elections/vote.shtml", "n"],
   ["NM", "New Mexico", "https://voterportal.servis.sos.state.nm.us/", "b"],
-  ["NY", "New York", "https://voterlookup.elections.ny.gov/", "l"],
+  ["NY", "New York", "https://elections.ny.gov", "n"],
   ["NC", "North Carolina", "https://vt.ncsbe.gov/RegLkup", "b"],
-  ["ND", "North Dakota", "https://vip.sos.nd.gov/", "b"],
-  ["OH", "Ohio", "https://www.ohiosos.gov/elections/voters/toolkit/sample-ballot/", "b"],
-  ["OK", "Oklahoma", "https://okvoterportal.okelections.us/", "l"],
-  ["OR", "Oregon", "https://sos.oregon.gov/voting/Pages/myvote.aspx", "l"],
+  ["ND", "North Dakota", "https://vote.nd.gov/", "b"],
+  ["OH", "Ohio", "https://www.ohiosos.gov/directories/sample-ballot", "b"],
+  ["OK", "Oklahoma", "https://okvoterportal.okelections.gov/", "l"],
+  ["OR", "Oregon", "https://sos.oregon.gov/elections/pages/myvote.aspx", "l"],
   ["PA", "Pennsylvania", "https://www.pavoterservices.pa.gov/Pages/VoterRegistrationStatus.aspx", "l"],
-  ["RI", "Rhode Island", "https://vote.sos.ri.gov/", "b"],
+  ["RI", "Rhode Island", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "b"],
   ["SC", "South Carolina", "https://scvotes.gov/", "b"],
   ["SD", "South Dakota", "https://vip.sdsos.gov/", "l"],
   ["TN", "Tennessee", "https://tnmap.tn.gov/voterlookup/", "l"],
@@ -330,7 +332,7 @@ var STATES = [
   ["VA", "Virginia", "https://vote.elections.virginia.gov/VoterInformation", "l"],
   ["WA", "Washington", "https://voter.votewa.gov/", "l"],
   ["WV", "West Virginia", "https://sos.wv.gov/elections", "b"],
-  ["WI", "Wisconsin", "https://myvote.wi.gov/", "l"],
+  ["WI", "Wisconsin", "https://myvote.wi.gov/en-us/Whats-On-My-Ballot", "b"],
   ["WY", "Wyoming", "https://sos.wyo.gov/Elections/Default.aspx", "l"]
 ];
 
@@ -340,7 +342,9 @@ var STATES = [
   STATES.forEach(function(st){
     var o = document.createElement("option"); o.value = st[0]; o.textContent = st[1]; sel.appendChild(o);
     var li = document.createElement("li"), a = document.createElement("a");
-    a.href = st[2]; a.target = "_blank"; a.rel = "noopener"; a.textContent = st[1]; li.appendChild(a); list.appendChild(li);
+    a.href = st[2]; a.target = "_blank"; a.rel = "noopener"; a.textContent = st[1]; li.appendChild(a);
+    if (st[3] === "n") li.appendChild(document.createTextNode(" (no online sample ballot found)"));
+    list.appendChild(li);
   });
   function show(code){
     var st = null; STATES.forEach(function(x){ if (x[0] === code) st = x; });
@@ -350,6 +354,8 @@ var STATES = [
     var k = document.createElement("p"); k.className = "kind";
     k.textContent = st[3] === "b"
       ? "This official page shows or links your sample ballot after you enter your information."
+      : st[3] === "n"
+      ? "As of October 15, 2026, this state does not appear to provide sample ballots online. This link goes to its main official election information page. Your county or local election office may still be able to give you a sample ballot."
       : "This is your state's official voter lookup or election site. Sample ballots in this state usually come from your county elections office, so look for a link to your county after you search.";
     out.appendChild(k);
     var a = document.createElement("a"); a.className = "btn"; a.href = st[2]; a.target = "_blank"; a.rel = "noopener";
