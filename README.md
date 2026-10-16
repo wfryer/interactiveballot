@@ -25,6 +25,7 @@ Interactive Ballot is a [Heal Our Culture](https://healourculture.org) project. 
 
 - `index.html`: the homepage. One self-contained file, no frameworks.
 - `stallings-2025/`: the archived Town of Stallings, NC ballot for November 4, 2025, with its sample ballot PDF.
+- `2024-11/`: the archived Stevens Mill (Stallings, NC) ballot for November 5, 2024.
 - `tools/build_ballot.py`: generates the Union County, NC 2026 ballot page. Run `python3 -I tools/build_ballot.py out.html`. The live Union page is at [wfryer/interactive-ballot-union-nc-2026](https://github.com/wfryer/interactive-ballot-union-nc-2026).
 
 ## Nonpartisan disclaimer

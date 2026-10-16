@@ -142,7 +142,7 @@ SECTIONS = [
                         L("campaign", "Campaign Substack", "https://winwardfornc.substack.com"),
                         L("third", BR, "https://www.ballotready.org/people/christine-e-winward")]},
                     {"name": "Todd Johnson", "party": "R", "incumbent": True, "links": [
-                        L("campaign", "Campaign website", "http://www.votetoddjohnson.com/"),
+                        L("campaign", "Campaign website", "https://votetoddjohnson.com/"),
                         L("third", BR, "https://www.ballotready.org/people/matthew-todd-t-johnson")]},
                 ],
             },
